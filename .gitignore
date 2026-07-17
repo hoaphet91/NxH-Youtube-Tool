@@ -1,0 +1,22 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+
+# Environment files
+.env
+.env.*
+
+# Output and generated files
+output/
+*.zip
+
+# Local UI state
+webui/data/
+
+# OS files
+Thumbs.db
+.DS_Store

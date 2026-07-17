@@ -1,0 +1,13 @@
+{
+  "remote": "https://github.com/hoaphet91/NxH-Youtube-Tool.git",
+  "branch": "main",
+  "paths": [
+    "modules/",
+    "webui/static/style.css",
+    "main.py",
+    "git_auto_push.py",
+    "git_push_config.json",
+    ".gitignore"
+  ],
+  "watch_interval_seconds": 5
+}
