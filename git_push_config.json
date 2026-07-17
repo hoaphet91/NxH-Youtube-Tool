@@ -1,0 +1,8 @@
+{
+  "remote": "https://github.com/hoaphet91/NxH-Youtube-Tool.git",
+  "branch": "main",
+  "paths": [
+    "modules/"
+  ],
+  "watch_interval_seconds": 3
+}

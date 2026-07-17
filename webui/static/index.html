@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Pipeline Sinh Video — Web UI</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1><span id="statusDot" class="status-dot"></span> 🎬 Pipeline Video</h1>
+  <button class="btn-icon" id="btnLogout">Đăng xuất</button>
+</header>
+
+<nav class="tabs" id="tabNav">
+  <button data-tab="script" class="active">Kịch bản</button>
+  <button data-tab="media">Ảnh &amp; Video</button>
+  <button data-tab="audio">Audio test</button>
+  <button data-tab="config">Cấu hình</button>
+  <button data-tab="run">Chạy</button>
+  <button data-tab="results">Kết quả</button>
+</nav>
+
+<main>
+
+  <!-- ============ TAB: KỊCH BẢN ============ -->
+  <section class="tab-panel active" id="tab-script">
+    <div class="card">
+      <h2>Kịch bản</h2>
+      <p class="hint">Dán trực tiếp nội dung kịch bản vào ô bên dưới, hoặc tải lên file <b>.txt</b> / <b>.md</b> (kể cả file
+      xuất thẳng từ skill viết kịch bản — hệ thống tự nhận diện và bóc phần script ra khỏi khối markdown nếu có).</p>
+      <div class="drop-zone" id="scriptDrop">📄 Bấm để chọn file .txt / .md, hoặc kéo-thả vào đây</div>
+      <input type="file" id="scriptFileInput" accept=".txt,.md" class="hidden">
+      <label>Nội dung kịch bản</label>
+      <textarea id="scriptText" rows="16" placeholder="[SCENE]&#10;NARRATION: ...&#10;MOTION: ...&#10;"></textarea>
+      <p class="hint" id="scriptStats">0 ký tự · ~0 cảnh ước tính</p>
+      <div class="btn-row">
+        <button class="btn" id="btnSaveScript">Lưu kịch bản</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: ẢNH & VIDEO ============ -->
+  <section class="tab-panel" id="tab-media">
+    <div class="card">
+      <h2>Ảnh tĩnh cho từng cảnh</h2>
+      <p class="hint">Chọn ảnh <b>theo đúng thứ tự cảnh</b> (cảnh 1 trước, cảnh 2 sau...). Nếu thứ tự bị xáo trộn sau khi
+      chọn, dùng nút ▲▼ để sắp lại trước khi tải lên. Số ảnh phải khớp số cảnh KHÔNG dùng <code>VIDEO:</code> trong kịch bản.</p>
+      <div class="drop-zone" id="imageDrop">🖼️ Bấm để chọn nhiều ảnh, hoặc kéo-thả vào đây</div>
+      <input type="file" id="imageFileInput" accept=".png,.jpg,.jpeg" multiple class="hidden">
+      <div class="thumb-grid" id="imagePreviewGrid"></div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="imageClearExisting" checked>
+        <label for="imageClearExisting">Xoá toàn bộ ảnh cũ trên máy chủ trước khi tải lên</label>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="btnUploadImages">Tải ảnh lên máy chủ</button>
+        <button class="btn secondary small" id="btnClearImageQueue">Bỏ chọn hết</button>
+      </div>
+      <h3>Ảnh hiện có trên máy chủ</h3>
+      <div class="file-chip-list" id="serverImageList"></div>
+      <div class="btn-row">
+        <button class="btn danger small" id="btnDeleteAllImages">Xoá hết ảnh trên máy chủ</button>
+        <button class="btn secondary small" id="btnRefreshImages">Làm mới danh sách</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Video dựng sẵn (field <code>VIDEO:</code>)</h2>
+      <p class="hint">Không cần đúng thứ tự — kịch bản tham chiếu video theo <b>tên file</b>. Giữ nguyên tên file khi tải lên.</p>
+      <div class="drop-zone" id="videoDrop">🎞️ Bấm để chọn video, hoặc kéo-thả vào đây</div>
+      <input type="file" id="videoFileInput" accept=".mp4,.mov,.mkv,.webm" multiple class="hidden">
+      <div class="file-chip-list" id="videoQueueList"></div>
+      <div class="btn-row">
+        <button class="btn" id="btnUploadVideos">Tải video lên máy chủ</button>
+      </div>
+      <h3>Video hiện có trên máy chủ</h3>
+      <div class="file-chip-list" id="serverVideoList"></div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: AUDIO TEST ============ -->
+  <section class="tab-panel" id="tab-audio">
+    <div class="card">
+      <h2>Audio test (khi TTS_ENABLED = false)</h2>
+      <p class="hint">Dùng để test nhanh các bước ghép ảnh/hiệu ứng/phụ đề mà không tốn phí gọi API TTS thật. Cần đúng
+      thứ tự cảnh, giống mục ảnh. Bật/tắt tính năng này ở tab Cấu hình (mục TTS_ENABLED).</p>
+      <div class="drop-zone" id="audioDrop">🔊 Bấm để chọn audio (.mp3/.wav/.m4a), hoặc kéo-thả vào đây</div>
+      <input type="file" id="audioFileInput" accept=".mp3,.wav,.m4a" multiple class="hidden">
+      <div class="file-chip-list" id="audioQueueList"></div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="audioClearExisting" checked>
+        <label for="audioClearExisting">Xoá toàn bộ audio cũ trên máy chủ trước khi tải lên</label>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="btnUploadAudio">Tải audio lên máy chủ</button>
+      </div>
+      <h3>Audio hiện có trên máy chủ</h3>
+      <div class="file-chip-list" id="serverAudioList"></div>
+      <div class="btn-row">
+        <button class="btn danger small" id="btnDeleteAllAudio">Xoá hết audio trên máy chủ</button>
+        <button class="btn secondary small" id="btnRefreshAudio">Làm mới danh sách</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: CẤU HÌNH ============ -->
+  <section class="tab-panel" id="tab-config">
+    <div class="card">
+      <h2>Bảo mật Web UI</h2>
+      <p class="hint">Đặt mật khẩu để bảo vệ trang điều khiển này khi truy cập từ xa. Để trống = không yêu cầu đăng nhập
+      (chỉ nên dùng khi chạy trong mạng nội bộ tin cậy).</p>
+      <label>Mật khẩu Web UI (WEBUI_PASSWORD)</label>
+      <input type="password" id="cfg_WEBUI_PASSWORD">
+    </div>
+    <div class="card" id="configFormCard">
+      <h2>Cấu hình pipeline (.env)</h2>
+      <div id="configFormContainer"></div>
+    </div>
+    <div class="btn-row" style="margin: 4px 2px 20px;">
+      <button class="btn block" id="btnSaveConfig">Lưu toàn bộ cấu hình</button>
+    </div>
+  </section>
+
+  <!-- ============ TAB: CHẠY ============ -->
+  <section class="tab-panel" id="tab-run">
+    <div class="card">
+      <h2>Bắt đầu tạo video</h2>
+      <label>Tiêu đề video</label>
+      <input type="text" id="runTitle" placeholder="VD: Sapa buổi sáng sương mù">
+      <label>Tên file xuất ra</label>
+      <input type="text" id="runOutput" placeholder="final_video.mp4" value="final_video.mp4">
+      <div class="btn-row">
+        <button class="btn block" id="btnStartRun">▶ Bắt đầu chạy pipeline</button>
+        <button class="btn danger" id="btnCancelRun" disabled>■ Huỷ</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Trạng thái <span class="badge idle" id="runBadge">chưa chạy</span></h2>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-status">
+          <span id="progressLabel">Chưa có tiến trình</span>
+          <strong id="progressPct">0%</strong>
+        </div>
+      </div>
+      <p class="hint" id="runMeta">Chưa có tiến trình nào.</p>
+      <div class="log-console" id="logConsole"></div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: KẾT QUẢ ============ -->
+  <section class="tab-panel" id="tab-results">
+    <div class="card">
+      <h2>Video &amp; báo cáo</h2>
+      <button class="btn secondary small" id="btnRefreshOutputs">Làm mới</button>
+      <div id="outputsList" style="margin-top:12px;"></div>
+    </div>
+    <div class="card">
+      <h2>Lịch sử các lần chạy</h2>
+      <div id="historyList"></div>
+    </div>
+  </section>
+
+</main>
+
+<div id="toastRoot"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

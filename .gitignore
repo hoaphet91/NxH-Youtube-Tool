@@ -1,0 +1,25 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+.env.*
+
+# Editor/project files
+*.swp
+*.swo
+*.vscode/
+.idea/
+
+# Build / output
+output/
+*.log
+
+# Local UI state
+webui/data/
+
+# Generated temp folders
+tmpls7pa3m5/
