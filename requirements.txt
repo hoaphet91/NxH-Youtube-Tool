@@ -1,0 +1,8 @@
+python-dotenv
+requests
+Pillow
+srt
+pydub
+openai
+faster-whisper
+edge-tts

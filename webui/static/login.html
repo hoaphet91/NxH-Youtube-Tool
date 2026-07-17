@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Đăng nhập — Pipeline Video</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <h1>🎬 Pipeline Sinh Video</h1>
+    <p>Nhập mật khẩu để điều khiển từ xa.</p>
+    <label>Mật khẩu</label>
+    <input type="password" id="pw" autofocus>
+    <div id="err" style="color:#f87171;font-size:12.5px;margin-top:8px;"></div>
+    <div class="btn-row">
+      <button class="btn block" id="btnLogin">Đăng nhập</button>
+    </div>
+  </div>
+</div>
+<script>
+async function doLogin() {
+  const pw = document.getElementById('pw').value;
+  const errEl = document.getElementById('err');
+  errEl.textContent = '';
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({password: pw})
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      errEl.textContent = data.detail || 'Sai mật khẩu.';
+      return;
+    }
+    window.location.href = '/';
+  } catch (e) {
+    errEl.textContent = 'Không kết nối được máy chủ.';
+  }
+}
+document.getElementById('btnLogin').addEventListener('click', doLogin);
+document.getElementById('pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>
